@@ -4,3 +4,12 @@ venv/
 __pycache__/
 *.pyc
 .env
+
+# Ignore build outputs
+bin/
+**/bin/
+obj/
+**/obj/
+AjpWiki.Web/obj/AjpWiki.Web.csproj.nuget.dgspec.json
+AjpWiki.Web/obj/project.assets.json
+AjpWiki.Web/obj/project.nuget.cache

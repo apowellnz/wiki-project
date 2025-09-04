@@ -2,7 +2,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AjpWiki.Domain\AjpWiki.Domain.csproj" />
+  <ProjectReference Include="..\AjpWiki.Application\AjpWiki.Application.csproj" />
     <ProjectReference Include="..\AjpWiki.Shared\AjpWiki.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.8" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -11,4 +11,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.19" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AjpWiki.Application\AjpWiki.Application.csproj" />
+    <ProjectReference Include="..\AjpWiki.Infrastructure\AjpWiki.Infrastructure.csproj" />
+    <ProjectReference Include="..\AjpWiki.Shared\AjpWiki.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

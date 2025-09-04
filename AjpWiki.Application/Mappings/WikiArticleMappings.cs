@@ -1,7 +1,7 @@
 using AjpWiki.Application.Dto;
 using AjpWiki.Domain.Entities;
 
-namespace AjpWiki.Shared.Mappings
+namespace AjpWiki.Application.Mappings
 {
     public static class WikiArticleMappings
     {

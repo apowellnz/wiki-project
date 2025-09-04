@@ -15,8 +15,8 @@ namespace AjpWiki.Infrastructure.Repositories
         };
         private readonly List<WikiArticleVersion> _versions = new();
 
-        // Simple in-memory lock tracking (articleId -> (userId, acquiredAt))
-        private readonly Dictionary<Guid, (Guid UserId, DateTime AcquiredAt)> _locks = new();
+    // Simple in-memory lock tracking (articleId -> (userId, acquiredAt))
+    private readonly Dictionary<Guid, (Guid UserId, DateTimeOffset AcquiredAt)> _locks = new();
 
         public Task<WikiArticle?> GetByIdAsync(Guid id) => Task.FromResult(_store.FirstOrDefault(x => x.Id == id));
 
@@ -25,14 +25,14 @@ namespace AjpWiki.Infrastructure.Repositories
         public Task<WikiArticleVersion> CreateVersionAsync(WikiArticleVersion version)
         {
             if (version.Id == Guid.Empty) version.Id = Guid.NewGuid();
-            version.CreatedAt = version.CreatedAt == default ? DateTime.UtcNow : version.CreatedAt;
+            version.CreatedAt = version.CreatedAt == default ? DateTimeOffset.UtcNow : version.CreatedAt;
             _versions.Add(version);
 
             var article = _store.FirstOrDefault(a => a.Id == version.ArticleId);
             if (article != null)
             {
                 article.CurrentVersionId = version.Id;
-                article.UpdatedAt = DateTime.UtcNow;
+                article.UpdatedAt = DateTimeOffset.UtcNow;
             }
 
             return Task.FromResult(version);
@@ -59,14 +59,14 @@ namespace AjpWiki.Infrastructure.Repositories
 
             version.IsDraft = false;
             article.PublishedVersionId = versionId;
-            article.UpdatedAt = DateTime.UtcNow;
+            article.UpdatedAt = DateTimeOffset.UtcNow;
 
             return Task.CompletedTask;
         }
 
         public Task<bool> TryAcquireLockAsync(Guid articleId, Guid userId, TimeSpan lockTimeout)
         {
-            var now = DateTime.UtcNow;
+            var now = DateTimeOffset.UtcNow;
             if (!_locks.TryGetValue(articleId, out var current))
             {
                 _locks[articleId] = (userId, now);
@@ -81,7 +81,7 @@ namespace AjpWiki.Infrastructure.Repositories
             }
 
             // If existing lock expired, replace it
-            if (current.AcquiredAt + lockTimeout <= now)
+        if (current.AcquiredAt + lockTimeout <= now)
             {
                 _locks[articleId] = (userId, now);
                 var article = _store.FirstOrDefault(a => a.Id == articleId);
@@ -89,7 +89,7 @@ namespace AjpWiki.Infrastructure.Repositories
                 {
                     article.IsLocked = true;
                     article.LockedByUserId = userId;
-                    article.LockAcquiredAt = now;
+            article.LockAcquiredAt = now;
                 }
                 return Task.FromResult(true);
             }

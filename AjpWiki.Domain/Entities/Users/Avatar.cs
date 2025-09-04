@@ -11,6 +11,6 @@ namespace AjpWiki.Domain.Entities.Users
         public string? ContentType { get; set; }
         public long Size { get; set; }
         public string? StorageKey { get; set; } // abstract key (could be DB blob id or blob path/url)
-        public DateTime CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }

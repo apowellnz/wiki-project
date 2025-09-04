@@ -1,8 +1,9 @@
 using System;
+using AjpWiki.Domain.Entities.Articles;
 
 namespace AjpWiki.Domain.Entities.Articles.Components
 {
-    public class RichTextComponent : AjpWiki.Domain.Entities.Articles.ArticleComponent
+    public class RichTextComponent : ArticleComponent
     {
         // Prefer storing a canonical markdown source and optionally precomputed HTML
     // Markdown is the canonical source of truth for the component content. Renderers should

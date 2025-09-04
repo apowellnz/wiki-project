@@ -25,9 +25,9 @@ namespace AjpWiki.Domain.Entities.Users
         public DateTimeOffset? LockoutEnd { get; set; }
         public int AccessFailedCount { get; set; }
 
-        // Audit
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        // Audit (store offset-aware timestamps)
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
 
         // Navigation
         public List<UserRole> Roles { get; set; } = new();

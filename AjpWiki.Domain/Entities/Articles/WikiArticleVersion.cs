@@ -23,8 +23,8 @@ namespace AjpWiki.Domain.Entities.Articles
         // Free-text message about the change
         public string? ChangeSummary { get; set; }
 
-        // When this version was created
-        public DateTime CreatedAt { get; set; }
+        // When this version was created (instant + offset)
+        public DateTimeOffset CreatedAt { get; set; }
 
         // Ordered list of page components (blocks)
         public List<ArticleComponent> Components { get; set; } = new List<ArticleComponent>();

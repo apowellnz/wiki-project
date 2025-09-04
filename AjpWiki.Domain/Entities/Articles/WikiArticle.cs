@@ -28,10 +28,10 @@ namespace AjpWiki.Domain.Entities.Articles
         public Guid? LockedByUserId { get; set; }
 
         // When the lock was acquired (UTC)
-        public DateTime? LockAcquiredAt { get; set; }
+        public DateTimeOffset? LockAcquiredAt { get; set; }
 
-        // Metadata timestamps
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        // Metadata timestamps (stored as an absolute instant with offset)
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset UpdatedAt { get; set; }
     }
 }

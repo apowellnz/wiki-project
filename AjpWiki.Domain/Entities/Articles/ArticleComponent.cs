@@ -15,17 +15,7 @@ namespace AjpWiki.Domain.Entities.Articles
         // Position within the version's component list. Application layer should maintain ordering.
         public int Order { get; set; }
 
-        public ComponentType Type { get; set; }
     }
 
-    public enum ComponentType
-    {
-        Title = 0,
-        RichText = 1,
-        Image = 2,
-        Table = 3,
-        List = 4,
-        // Allows future custom widgets to be added without changing existing consumers
-        Custom = 100
-    }
+   
 }

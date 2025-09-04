@@ -45,30 +45,43 @@ namespace AjpWiki.Infrastructure.Services
                     var typeStr = t?.ToString();
                     if (string.Equals(typeStr, "title", StringComparison.OrdinalIgnoreCase))
                     {
-                        var comp = new AjpWiki.Domain.Entities.Articles.Components.TitleComponent { Order = order, Type = ComponentType.Title };
+                        var comp = new AjpWiki.Domain.Entities.Articles.Components.TitleComponent { Order = order };
                         if (dict.TryGetValue("text", out var text)) comp.Text = text?.ToString();
                         domainComponents.Add(comp);
                         continue;
                     }
                     if (string.Equals(typeStr, "richtext", StringComparison.OrdinalIgnoreCase))
                     {
-                        var comp = new AjpWiki.Domain.Entities.Articles.Components.RichTextComponent { Order = order, Type = ComponentType.RichText };
+                        var comp = new AjpWiki.Domain.Entities.Articles.Components.RichTextComponent { Order = order };
                         if (dict.TryGetValue("markdown", out var md)) comp.Markdown = md?.ToString();
                         domainComponents.Add(comp);
                         continue;
                     }
                     if (string.Equals(typeStr, "image", StringComparison.OrdinalIgnoreCase))
                     {
-                        var comp = new AjpWiki.Domain.Entities.Articles.Components.ImageComponent { Order = order, Type = ComponentType.Image };
-                        if (dict.TryGetValue("mediaAssetId", out var ma) && Guid.TryParse(ma?.ToString(), out var mid)) comp.MediaAssetId = mid;
-                        if (dict.TryGetValue("alt", out var alt)) comp.AltText = alt?.ToString();
+                        // No dedicated ImageComponent exists in domain; represent image as a small richtext block
+                        // with an inline widget reference to the media asset. This keeps the domain model minimal.
+                        var comp = new AjpWiki.Domain.Entities.Articles.Components.RichTextComponent { Order = order };
+                        if (dict.TryGetValue("mediaAssetId", out var ma) && Guid.TryParse(ma?.ToString(), out var mid))
+                        {
+                            comp.InlineWidgetReferences.Add(new AjpWiki.Domain.Entities.Articles.Components.InlineWidgetReference
+                            {
+                                MediaAssetId = mid,
+                                Token = $"media:{mid}"
+                            });
+                        }
+                        if (dict.TryGetValue("alt", out var alt) && alt != null)
+                        {
+                            comp.Markdown = comp.Markdown == null ? alt.ToString() : comp.Markdown + "\n" + alt.ToString();
+                        }
                         domainComponents.Add(comp);
                         continue;
                     }
                 }
 
                 // Fallback: custom component wrapper
-                var custom = new AjpWiki.Domain.Entities.Articles.Components.CustomComponent { Order = order, Type = ComponentType.Custom };
+                // Fallback: represent unknown/custom components as an empty rich-text block (editors can populate)
+                var custom = new AjpWiki.Domain.Entities.Articles.Components.RichTextComponent { Order = order };
                 domainComponents.Add(custom);
             }
 

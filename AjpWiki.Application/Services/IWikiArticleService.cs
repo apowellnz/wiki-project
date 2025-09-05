@@ -1,21 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using AjpWiki.Application.Dto;
 
 namespace AjpWiki.Application.Services
 {
     public interface IWikiArticleService
     {
-    Task<WikiArticleDto?> GetAsync(Guid id);
-    Task<IEnumerable<WikiArticleDto>> ListAsync();
-
-    // Versioning
-    Task<WikiArticleDto> CreateVersionAsync(Guid articleId, Guid authorId, bool isDraft, string? changeSummary, IEnumerable<object> components);
-    Task PublishVersionAsync(Guid articleId, Guid versionId, Guid actorUserId);
-
-    // Locking
-    Task<bool> TryAcquireLockAsync(Guid articleId, Guid userId, TimeSpan lockTimeout);
-    Task ReleaseLockAsync(Guid articleId, Guid userId);
+        // Only service contract, no implementation or out-of-scope details
+        Task<object> CreateArticleAsync(object articleDto);
+        Task<object> EditArticleAsync(int articleId, object articleDto);
+        Task<IEnumerable<object>> SearchArticlesAsync(string query);
+        Task<IEnumerable<object>> GetArticlesByTagAsync(string tag);
+        Task<object> GetArticleByIdAsync(int articleId);
+        Task<IEnumerable<object>> GetArticleHistoryAsync(int articleId);
+        Task RollbackArticleAsync(int articleId, int versionId);
+        Task AddComponentAsync(int articleId, object componentDto);
+        Task<IEnumerable<object>> GetComponentsAsync(int articleId);
+        Task ProposeChangeAsync(int articleId, object proposedChangeDto);
+        Task ReviewChangeAsync(int articleId, int changeId, bool accept);
     }
 }

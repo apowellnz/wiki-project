@@ -20,4 +20,9 @@
     <ProjectReference Include="..\AjpWiki.Shared\AjpWiki.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages/Articles/" />
+    <Folder Include="Pages/Users/" />
+  </ItemGroup>
+
 </Project>

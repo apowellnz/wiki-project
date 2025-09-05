@@ -104,6 +104,26 @@ namespace AjpWiki.Infrastructure.Tests.Services
             Assert.Equal("Test Article", list.First().Title);
         }
 
+        [Fact]
+        public void CreateArticle_WithDuplicateSlug_ShouldThrow()
+        {
+            var options = new DbContextOptionsBuilder<WikiDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+            using var db = new WikiDbContext(options);
+            var repo = new EfWikiArticleRepository(db);
+            var service = new WikiArticleService(repo);
+
+            var slug = "test-article";
+            // Create first article using the repository so we can set the Slug on the domain entity
+            var a1 = new AjpWiki.Domain.Entities.Articles.WikiArticle { Title = "Test Article 1", Slug = slug };
+            var created1 = repo.CreateArticleAsync(a1).GetAwaiter().GetResult();
+
+            var a2 = new AjpWiki.Domain.Entities.Articles.WikiArticle { Title = "Test Article 2", Slug = slug };
+            Assert.Throws<InvalidOperationException>(() => repo.CreateArticleAsync(a2).GetAwaiter().GetResult());
+        }
+
         // User Story 15: Tagging/Categorization
         [Fact]
         public void GetArticlesByTag_ShouldReturnTaggedArticles()

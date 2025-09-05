@@ -23,6 +23,14 @@ namespace AjpWiki.Infrastructure.Repositories
             if (article.Id == Guid.Empty) article.Id = Guid.NewGuid();
             article.CreatedAt = DateTimeOffset.UtcNow;
             article.UpdatedAt = article.CreatedAt;
+
+            // Enforce slug uniqueness at repository level to surface a clear domain error
+            if (!string.IsNullOrWhiteSpace(article.Slug))
+            {
+                var exists = await _db.WikiArticles.AnyAsync(a => a.Slug == article.Slug);
+                if (exists) throw new InvalidOperationException("An article with the same slug already exists.");
+            }
+
             await _db.WikiArticles.AddAsync(article);
             await _db.SaveChangesAsync();
             return article;

@@ -18,7 +18,15 @@ namespace AjpWiki.Infrastructure.Services
 
         public async Task CreateUserAsync(string name, string email, string password)
         {
-            var user = new User { Id = Guid.NewGuid(), DisplayName = name, Email = email, PasswordHash = password, CreatedAt = DateTimeOffset.UtcNow };
+            // Basic validation
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("email is required", nameof(email));
+            if (string.IsNullOrWhiteSpace(password) || password.Length < 6) throw new ArgumentException("password is too short", nameof(password));
+
+            // Uniqueness check
+            var exists = _db.Users.Any(u => u.Email == email);
+            if (exists) throw new InvalidOperationException("A user with that email already exists");
+
+            var user = new User { Id = Guid.NewGuid(), DisplayName = name, Email = email, PasswordHash = password, CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow };
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
         }
@@ -43,8 +51,31 @@ namespace AjpWiki.Infrastructure.Services
             await _db.SaveChangesAsync();
         }
 
-    public Task ChangeAvatarAsync(Guid userId, byte[] avatarData) => Task.CompletedTask;
-    public Task DeleteAccountAsync(Guid userId) => Task.CompletedTask;
+    public async Task DeleteAccountAsync(Guid userId)
+    {
+        var user = await _db.Users.FindAsync(userId);
+        if (user == null) return;
+
+        // Remove related notifications
+        var notes = _db.Notifications.Where(n => n.UserId == userId).ToList();
+        if (notes.Any()) _db.Notifications.RemoveRange(notes);
+
+        // Optionally, handle articles (not deleting articles by default)
+
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+    }
         public Task ResetPasswordAsync(string email) => Task.CompletedTask;
+
+    public Task ChangeAvatarAsync(Guid userId, byte[] avatarData)
+    {
+        // Validate avatar: max 2MB for now
+        const int maxBytes = 2 * 1024 * 1024;
+        if (avatarData == null || avatarData.Length == 0) throw new ArgumentException("avatar data required", nameof(avatarData));
+        if (avatarData.Length > maxBytes) throw new ArgumentException("avatar too large", nameof(avatarData));
+
+        // For now we don't persist avatars; in future store in blob store and save AvatarId on user
+        return Task.CompletedTask;
+    }
     }
 }

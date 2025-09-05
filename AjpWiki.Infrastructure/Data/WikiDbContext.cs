@@ -34,7 +34,8 @@ public class WikiDbContext : DbContext
     modelBuilder.Entity<WikiArticleVersion>().HasKey(v => v.Id);
 
     modelBuilder.Entity<AjpWiki.Domain.Entities.Users.User>().HasKey(u => u.Id);
-    modelBuilder.Entity<AjpWiki.Domain.Entities.Users.User>().HasIndex(u => u.Email).IsUnique(false);
+    // Make Email unique at the DB level to support uniqueness guarantees in integration tests.
+    modelBuilder.Entity<AjpWiki.Domain.Entities.Users.User>().HasIndex(u => u.Email).IsUnique();
 
     modelBuilder.Entity<AjpWiki.Domain.Entities.Notifications.Notification>().HasKey(n => n.Id);
     }

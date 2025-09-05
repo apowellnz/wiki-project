@@ -28,13 +28,17 @@ namespace AjpWiki.Infrastructure.Services
             await _db.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<string>> GetNotificationsAsync(Guid userId)
+        public Task<IEnumerable<AjpWiki.Application.Dto.NotificationDto>> GetNotificationsAsync(Guid userId)
         {
-            var list = _db.Notifications.Where(x => x.UserId == userId).OrderByDescending(n => n.CreatedAt).Select(x => x.Message).ToList();
-            return Task.FromResult<IEnumerable<string>>(list);
+            var list = _db.Notifications.Where(x => x.UserId == userId)
+                .OrderByDescending(n => n.CreatedAt)
+                .Select(x => new AjpWiki.Application.Dto.NotificationDto(x.Id, x.UserId, x.Message, x.IsRead, x.CreatedAt))
+                .ToList();
+
+            return Task.FromResult<IEnumerable<AjpWiki.Application.Dto.NotificationDto>>(list);
         }
 
-        public Task<IEnumerable<string>> GetNotificationsAsync(Guid userId, int page, int pageSize)
+    public Task<IEnumerable<AjpWiki.Application.Dto.NotificationDto>> GetNotificationsAsync(Guid userId, int page, int pageSize)
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
@@ -44,10 +48,10 @@ namespace AjpWiki.Infrastructure.Services
                 .OrderByDescending(n => n.CreatedAt)
                 .Skip(skip)
                 .Take(pageSize)
-                .Select(x => x.Message)
+                .Select(x => new AjpWiki.Application.Dto.NotificationDto(x.Id, x.UserId, x.Message, x.IsRead, x.CreatedAt))
                 .ToList();
 
-            return Task.FromResult<IEnumerable<string>>(list);
+            return Task.FromResult<IEnumerable<AjpWiki.Application.Dto.NotificationDto>>(list);
         }
 
         public async Task MarkAsReadAsync(Guid notificationId)
@@ -56,6 +60,20 @@ namespace AjpWiki.Infrastructure.Services
             if (n == null) return; // idempotent: missing -> no-op
             if (n.IsRead) return; // idempotent
             n.IsRead = true;
+            await _db.SaveChangesAsync();
+        }
+
+        public Task<int> GetUnreadCountAsync(Guid userId)
+        {
+            var count = _db.Notifications.Count(n => n.UserId == userId && !n.IsRead);
+            return Task.FromResult(count);
+        }
+
+        public async Task MarkAllAsReadAsync(Guid userId)
+        {
+            var items = _db.Notifications.Where(n => n.UserId == userId && !n.IsRead).ToList();
+            if (!items.Any()) return;
+            foreach (var n in items) n.IsRead = true;
             await _db.SaveChangesAsync();
         }
     }

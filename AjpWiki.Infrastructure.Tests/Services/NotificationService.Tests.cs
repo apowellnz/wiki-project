@@ -88,7 +88,7 @@ namespace AjpWiki.Infrastructure.Tests.Services
             Assert.Equal(10, page1.Count);
             Assert.Equal(5, page3.Count);
             // Ensure ordering: newest first (m1 was newest because -1 minute)
-            Assert.Equal("m1", page1.First());
+            Assert.Equal("m1", page1.First().Message);
         }
 
         [Fact]
@@ -116,6 +116,31 @@ namespace AjpWiki.Infrastructure.Tests.Services
 
             // missing id should be no-op
             svc.MarkAsReadAsync(Guid.NewGuid()).GetAwaiter().GetResult();
+        }
+
+        [Fact]
+        public void GetUnreadCount_And_MarkAllAsRead_Works()
+        {
+            var options = new DbContextOptionsBuilder<WikiDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+            using var db = new WikiDbContext(options);
+            var uid = Guid.NewGuid();
+            db.Users.Add(new AjpWiki.Domain.Entities.Users.User { Id = uid, Email = "u@example.com", CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow });
+
+            db.Notifications.Add(new AjpWiki.Domain.Entities.Notifications.Notification { Id = Guid.NewGuid(), UserId = uid, Message = "m1", CreatedAt = DateTimeOffset.UtcNow, IsRead = false });
+            db.Notifications.Add(new AjpWiki.Domain.Entities.Notifications.Notification { Id = Guid.NewGuid(), UserId = uid, Message = "m2", CreatedAt = DateTimeOffset.UtcNow, IsRead = false });
+            db.Notifications.Add(new AjpWiki.Domain.Entities.Notifications.Notification { Id = Guid.NewGuid(), UserId = uid, Message = "m3", CreatedAt = DateTimeOffset.UtcNow, IsRead = true });
+            db.SaveChanges();
+
+            var svc = new NotificationService(db);
+            var unreadBefore = svc.GetUnreadCountAsync(uid).GetAwaiter().GetResult();
+            Assert.Equal(2, unreadBefore);
+
+            svc.MarkAllAsReadAsync(uid).GetAwaiter().GetResult();
+            var unreadAfter = svc.GetUnreadCountAsync(uid).GetAwaiter().GetResult();
+            Assert.Equal(0, unreadAfter);
         }
     }
 }

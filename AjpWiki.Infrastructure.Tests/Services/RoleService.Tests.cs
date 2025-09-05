@@ -4,10 +4,37 @@ namespace AjpWiki.Infrastructure.Tests.Services
 {
     public class RoleServiceTests
     {
+        // User Story 12: Role & Permission Management
         [Fact]
-        public void DummyTest()
+        public void AssignRole_ShouldAddRoleToUser()
         {
-            // TODO: Implement unit tests for RoleService
+            // Arrange
+            // Act
+            // Assert
+        }
+
+        [Fact]
+        public void RemoveRole_ShouldRemoveRoleFromUser()
+        {
+            // Arrange
+            // Act
+            // Assert
+        }
+
+        [Fact]
+        public void GetUserRoles_ShouldReturnAllRolesForUser()
+        {
+            // Arrange
+            // Act
+            // Assert
+        }
+
+        [Fact]
+        public void GetAllRoles_ShouldReturnAllRoles()
+        {
+            // Arrange
+            // Act
+            // Assert
         }
     }
 }

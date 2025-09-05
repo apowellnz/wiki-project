@@ -4,10 +4,21 @@ namespace AjpWiki.Infrastructure.Tests.Services
 {
     public class NotificationServiceTests
     {
+        // User Story 13: Notifications
         [Fact]
-        public void DummyTest()
+        public void SendNotification_ShouldDeliverMessageToUser()
         {
-            // TODO: Implement unit tests for NotificationService
+            // Arrange
+            // Act
+            // Assert
+        }
+
+        [Fact]
+        public void GetNotifications_ShouldReturnAllUserNotifications()
+        {
+            // Arrange
+            // Act
+            // Assert
         }
     }
 }

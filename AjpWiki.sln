@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AjpWiki.Shared", "AjpWiki.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AjpWiki.Web", "AjpWiki.Web\AjpWiki.Web.csproj", "{37B8DBA0-ACBE-4264-A934-B1591D87492D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AjpWiki.Infrastructure.Tests", "AjpWiki.Infrastructure.Tests\AjpWiki.Infrastructure.Tests.csproj", "{7DB9D1BE-D74F-4F0A-B434-8BA7C68721F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{37B8DBA0-ACBE-4264-A934-B1591D87492D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37B8DBA0-ACBE-4264-A934-B1591D87492D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37B8DBA0-ACBE-4264-A934-B1591D87492D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DB9D1BE-D74F-4F0A-B434-8BA7C68721F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DB9D1BE-D74F-4F0A-B434-8BA7C68721F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DB9D1BE-D74F-4F0A-B434-8BA7C68721F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DB9D1BE-D74F-4F0A-B434-8BA7C68721F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

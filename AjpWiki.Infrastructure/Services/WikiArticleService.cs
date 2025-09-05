@@ -12,13 +12,63 @@ namespace AjpWiki.Infrastructure.Services
 {
     public class WikiArticleService : IWikiArticleService
     {
-        public Task<WikiArticleDto> CreateArticleAsync(WikiArticleDto articleDto) => Task.FromResult(articleDto);
-        public Task<WikiArticleDto> EditArticleAsync(Guid articleId, WikiArticleDto articleDto) => Task.FromResult(articleDto);
+        private readonly IWikiArticleRepository _repo;
+
+        public WikiArticleService(IWikiArticleRepository repo)
+        {
+            _repo = repo;
+        }
+
+        public async Task<WikiArticleDto> CreateArticleAsync(WikiArticleDto articleDto)
+        {
+            var entity = new WikiArticle { Id = articleDto.Id == Guid.Empty ? Guid.NewGuid() : articleDto.Id, Title = articleDto.Title, CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow };
+            var created = await _repo.CreateArticleAsync(entity);
+            return created.ToDto();
+        }
+
+        public async Task<WikiArticleDto> EditArticleAsync(Guid articleId, WikiArticleDto articleDto)
+        {
+            var article = await _repo.GetByIdAsync(articleId) ?? throw new InvalidOperationException("Article not found");
+            article.Title = articleDto.Title;
+            article.UpdatedAt = DateTimeOffset.UtcNow;
+            // For now, persist via repository by creating a new version to track changes
+            var version = new WikiArticleVersion { ArticleId = article.Id, AuthorId = Guid.NewGuid(), IsDraft = false, ChangeSummary = "edit via service" };
+            await _repo.CreateVersionAsync(version);
+            return article.ToDto();
+        }
+
         public Task<IEnumerable<WikiArticleDto>> SearchArticlesAsync(string query) => Task.FromResult<IEnumerable<WikiArticleDto>>(new List<WikiArticleDto>());
         public Task<IEnumerable<WikiArticleDto>> GetArticlesByTagAsync(string tag) => Task.FromResult<IEnumerable<WikiArticleDto>>(new List<WikiArticleDto>());
-        public Task<WikiArticleDto?> GetArticleByIdAsync(Guid articleId) => Task.FromResult<WikiArticleDto?>(null);
-        public Task<IEnumerable<WikiArticleDto>> GetArticleHistoryAsync(Guid articleId) => Task.FromResult<IEnumerable<WikiArticleDto>>(new List<WikiArticleDto>());
-        public Task RollbackArticleAsync(Guid articleId, Guid versionId) => Task.CompletedTask;
+
+        public async Task<WikiArticleDto?> GetArticleByIdAsync(Guid articleId)
+        {
+            var a = await _repo.GetByIdAsync(articleId);
+            return a?.ToDto();
+        }
+
+        public async Task<IEnumerable<WikiArticleDto>> GetArticleHistoryAsync(Guid articleId)
+        {
+            var versions = await _repo.ListVersionsAsync(articleId);
+            var article = await _repo.GetByIdAsync(articleId);
+            return versions.Select(v => article!.ToDto());
+        }
+
+        public async Task RollbackArticleAsync(Guid articleId, Guid versionId)
+        {
+            var version = await _repo.GetVersionAsync(versionId) ?? throw new InvalidOperationException("Version not found");
+            // Simple rollback: create a new version that mirrors the chosen version
+            var newVersion = new WikiArticleVersion
+            {
+                ArticleId = articleId,
+                AuthorId = version.AuthorId,
+                IsDraft = false,
+                ChangeSummary = "rollback",
+                CreatedAt = DateTimeOffset.UtcNow,
+                Components = version.Components
+            };
+            await _repo.CreateVersionAsync(newVersion);
+        }
+
         public Task AddComponentAsync(Guid articleId, WikiArticleComponentDto componentDto) => Task.CompletedTask;
         public Task<IEnumerable<WikiArticleComponentDto>> GetComponentsAsync(Guid articleId) => Task.FromResult<IEnumerable<WikiArticleComponentDto>>(new List<WikiArticleComponentDto>());
         public Task ProposeChangeAsync(Guid articleId, WikiArticleDto proposedChangeDto) => Task.CompletedTask;

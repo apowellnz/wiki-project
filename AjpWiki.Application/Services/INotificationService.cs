@@ -5,7 +5,7 @@ namespace AjpWiki.Application.Services
 {
     public interface INotificationService
     {
-        Task SendNotificationAsync(int userId, string message);
-        Task<IEnumerable<string>> GetNotificationsAsync(int userId);
+    Task SendNotificationAsync(Guid userId, string message);
+    Task<IEnumerable<string>> GetNotificationsAsync(Guid userId);
     }
 }

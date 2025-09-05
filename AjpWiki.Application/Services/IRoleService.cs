@@ -5,9 +5,9 @@ namespace AjpWiki.Application.Services
 {
     public interface IRoleService
     {
-        Task AssignRoleAsync(int userId, string role);
-        Task RemoveRoleAsync(int userId, string role);
-        Task<IEnumerable<string>> GetUserRolesAsync(int userId);
+    Task AssignRoleAsync(Guid userId, string role);
+    Task RemoveRoleAsync(Guid userId, string role);
+    Task<IEnumerable<string>> GetUserRolesAsync(Guid userId);
         Task<IEnumerable<string>> GetAllRolesAsync();
     }
 }

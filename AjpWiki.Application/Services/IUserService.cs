@@ -7,11 +7,11 @@ namespace AjpWiki.Application.Services
     {
         Task CreateUserAsync(string name, string email, string password);
         Task RequestAccessAsync(string email);
-        Task ApproveUserAsync(int userId);
-        Task RejectUserAsync(int userId);
-        Task EditProfileAsync(int userId, string name, string email, string password);
-        Task ChangeAvatarAsync(int userId, byte[] avatarData);
-        Task DeleteAccountAsync(int userId);
+    Task ApproveUserAsync(Guid userId);
+    Task RejectUserAsync(Guid userId);
+    Task EditProfileAsync(Guid userId, string name, string email, string password);
+    Task ChangeAvatarAsync(Guid userId, byte[] avatarData);
+    Task DeleteAccountAsync(Guid userId);
         Task ResetPasswordAsync(string email);
     }
 }

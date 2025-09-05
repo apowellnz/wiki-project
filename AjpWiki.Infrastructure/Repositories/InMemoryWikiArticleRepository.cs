@@ -20,6 +20,15 @@ namespace AjpWiki.Infrastructure.Repositories
 
         public Task<WikiArticle?> GetByIdAsync(Guid id) => Task.FromResult(_store.FirstOrDefault(x => x.Id == id));
 
+        public Task<WikiArticle> CreateArticleAsync(WikiArticle article)
+        {
+            if (article.Id == Guid.Empty) article.Id = Guid.NewGuid();
+            article.CreatedAt = article.CreatedAt == default ? DateTimeOffset.UtcNow : article.CreatedAt;
+            article.UpdatedAt = article.UpdatedAt == default ? article.CreatedAt : article.UpdatedAt;
+            _store.Add(article);
+            return Task.FromResult(article);
+        }
+
         public Task<IEnumerable<WikiArticle>> ListAsync() => Task.FromResult<IEnumerable<WikiArticle>>(_store);
 
         public Task<WikiArticleVersion> CreateVersionAsync(WikiArticleVersion version)

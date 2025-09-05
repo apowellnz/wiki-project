@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AjpWiki.Domain.Entities.Articles
 {
@@ -7,7 +8,11 @@ namespace AjpWiki.Domain.Entities.Articles
     /// Base class for components that make up an article version. Keep it simple and serializable.
     /// Concrete components can add typed properties; additional custom components can be introduced
     /// by providing a derived type and mapping in the Application layer.
+    ///
+    /// This base type is intentionally not mapped by EF in the test harness to avoid complex
+    /// inheritance mapping while we focus on service behavior.
     /// </summary>
+    [NotMapped]
     public abstract class ArticleComponent
     {
         public Guid Id { get; set; }

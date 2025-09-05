@@ -7,6 +7,8 @@ namespace AjpWiki.Domain.Repositories
 {
     public interface IWikiArticleRepository
     {
+    // Create an article
+    Task<WikiArticle> CreateArticleAsync(WikiArticle article);
         Task<WikiArticle?> GetByIdAsync(Guid id);
         Task<IEnumerable<WikiArticle>> ListAsync();
 

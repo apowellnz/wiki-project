@@ -1,4 +1,11 @@
 using Xunit;
+using System;
+using Microsoft.EntityFrameworkCore;
+using AjpWiki.Infrastructure.Data;
+using AjpWiki.Infrastructure.Repositories;
+using AjpWiki.Infrastructure.Services;
+using AjpWiki.Domain.Entities.Articles;
+using System.Linq;
 
 namespace AjpWiki.Infrastructure.Tests.Services
 {
@@ -81,8 +88,20 @@ namespace AjpWiki.Infrastructure.Tests.Services
         public void CreateArticle_ShouldAddNewArticle()
         {
             // Arrange
-            // Act
-            // Assert
+            var options = new DbContextOptionsBuilder<WikiDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+            using var db = new WikiDbContext(options);
+            var repo = new EfWikiArticleRepository(db);
+            var service = new WikiArticleService(repo);
+
+            var articleDto = new AjpWiki.Application.Dto.WikiArticleDto(Guid.Empty, "Test Article", null, null, false);
+            var createdDto = service.CreateArticleAsync(articleDto).GetAwaiter().GetResult();
+
+            var list = repo.ListAsync().GetAwaiter().GetResult();
+            Assert.Single(list);
+            Assert.Equal("Test Article", list.First().Title);
         }
 
         // User Story 15: Tagging/Categorization

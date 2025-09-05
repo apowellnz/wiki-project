@@ -12,100 +12,16 @@ namespace AjpWiki.Infrastructure.Services
 {
     public class WikiArticleService : IWikiArticleService
     {
-        private readonly IWikiArticleRepository _repo;
-
-        public WikiArticleService(IWikiArticleRepository repo)
-        {
-            _repo = repo;
-        }
-
-        public async Task<WikiArticleDto?> GetAsync(Guid id)
-        {
-            var entity = await _repo.GetByIdAsync(id);
-            return entity?.ToDto();
-        }
-
-        public async Task<IEnumerable<WikiArticleDto>> ListAsync()
-        {
-            var list = await _repo.ListAsync();
-            return list.Select(x => x.ToDto());
-        }
-
-        public async Task<WikiArticleDto> CreateVersionAsync(Guid articleId, Guid authorId, bool isDraft, string? changeSummary, IEnumerable<object> components)
-        {
-            // Map incoming lightweight component representations to domain components.
-            var domainComponents = new List<ArticleComponent>();
-            int order = 0;
-            foreach (var c in components ?? Array.Empty<object>())
-            {
-                order++;
-                // Very small mapping: if caller passes an anonymous object with a Type property, attempt map
-                if (c is IDictionary<string, object> dict && dict.TryGetValue("type", out var t))
-                {
-                    var typeStr = t?.ToString();
-                    if (string.Equals(typeStr, "title", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var comp = new AjpWiki.Domain.Entities.Articles.Components.TitleComponent { Order = order };
-                        if (dict.TryGetValue("text", out var text)) comp.Text = text?.ToString();
-                        domainComponents.Add(comp);
-                        continue;
-                    }
-                    if (string.Equals(typeStr, "richtext", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var comp = new AjpWiki.Domain.Entities.Articles.Components.RichTextComponent { Order = order };
-                        if (dict.TryGetValue("markdown", out var md)) comp.Markdown = md?.ToString();
-                        domainComponents.Add(comp);
-                        continue;
-                    }
-                    if (string.Equals(typeStr, "image", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // No dedicated ImageComponent exists in domain; represent image as a small richtext block
-                        // with an inline widget reference to the media asset. This keeps the domain model minimal.
-                        var comp = new AjpWiki.Domain.Entities.Articles.Components.RichTextComponent { Order = order };
-                        if (dict.TryGetValue("mediaAssetId", out var ma) && Guid.TryParse(ma?.ToString(), out var mid))
-                        {
-                            comp.InlineWidgetReferences.Add(new AjpWiki.Domain.Entities.Articles.Components.InlineWidgetReference
-                            {
-                                MediaAssetId = mid,
-                                Token = $"media:{mid}"
-                            });
-                        }
-                        if (dict.TryGetValue("alt", out var alt) && alt != null)
-                        {
-                            comp.Markdown = comp.Markdown == null ? alt.ToString() : comp.Markdown + "\n" + alt.ToString();
-                        }
-                        domainComponents.Add(comp);
-                        continue;
-                    }
-                }
-
-                // Fallback: custom component wrapper
-                // Fallback: represent unknown/custom components as an empty rich-text block (editors can populate)
-                var custom = new AjpWiki.Domain.Entities.Articles.Components.RichTextComponent { Order = order };
-                domainComponents.Add(custom);
-            }
-
-            var version = new WikiArticleVersion
-            {
-                ArticleId = articleId,
-                AuthorId = authorId,
-                IsDraft = isDraft,
-                ChangeSummary = changeSummary,
-                Components = domainComponents
-            };
-
-            var created = await _repo.CreateVersionAsync(version);
-            var article = await _repo.GetByIdAsync(articleId) ?? throw new InvalidOperationException("Article not found");
-            return article.ToDto();
-        }
-
-        public async Task PublishVersionAsync(Guid articleId, Guid versionId, Guid actorUserId)
-        {
-            await _repo.PublishVersionAsync(articleId, versionId, actorUserId);
-        }
-
-        public Task<bool> TryAcquireLockAsync(Guid articleId, Guid userId, TimeSpan lockTimeout) => _repo.TryAcquireLockAsync(articleId, userId, lockTimeout);
-
-        public Task ReleaseLockAsync(Guid articleId, Guid userId) => _repo.ReleaseLockAsync(articleId, userId);
+        public Task<WikiArticleDto> CreateArticleAsync(WikiArticleDto articleDto) => Task.FromResult(articleDto);
+        public Task<WikiArticleDto> EditArticleAsync(Guid articleId, WikiArticleDto articleDto) => Task.FromResult(articleDto);
+        public Task<IEnumerable<WikiArticleDto>> SearchArticlesAsync(string query) => Task.FromResult<IEnumerable<WikiArticleDto>>(new List<WikiArticleDto>());
+        public Task<IEnumerable<WikiArticleDto>> GetArticlesByTagAsync(string tag) => Task.FromResult<IEnumerable<WikiArticleDto>>(new List<WikiArticleDto>());
+        public Task<WikiArticleDto?> GetArticleByIdAsync(Guid articleId) => Task.FromResult<WikiArticleDto?>(null);
+        public Task<IEnumerable<WikiArticleDto>> GetArticleHistoryAsync(Guid articleId) => Task.FromResult<IEnumerable<WikiArticleDto>>(new List<WikiArticleDto>());
+        public Task RollbackArticleAsync(Guid articleId, Guid versionId) => Task.CompletedTask;
+        public Task AddComponentAsync(Guid articleId, WikiArticleComponentDto componentDto) => Task.CompletedTask;
+        public Task<IEnumerable<WikiArticleComponentDto>> GetComponentsAsync(Guid articleId) => Task.FromResult<IEnumerable<WikiArticleComponentDto>>(new List<WikiArticleComponentDto>());
+        public Task ProposeChangeAsync(Guid articleId, WikiArticleDto proposedChangeDto) => Task.CompletedTask;
+        public Task ReviewChangeAsync(Guid articleId, Guid changeId, bool accept) => Task.CompletedTask;
     }
 }

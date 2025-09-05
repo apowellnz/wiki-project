@@ -17,14 +17,32 @@ namespace AjpWiki.Infrastructure.Services
             _db = db;
         }
 
-        public async Task AssignRoleAsync(Guid userId, string role)
+        public async Task AssignRoleAsync(Guid callerUserId, Guid userId, string role)
         {
+            // Only allow assigning 'admin' if caller is already admin
+            if (role == "admin")
+            {
+                var callerIsAdmin = _db.Set<UserRole>().Any(r => r.UserId == callerUserId && r.Role == "admin");
+                if (!callerIsAdmin) throw new UnauthorizedAccessException("Caller not permitted to assign admin role");
+            }
+
+            // Idempotent: don't add if role already present
+            var exists = _db.Set<UserRole>().Any(r => r.UserId == userId && r.Role == role);
+            if (exists) return;
+
             var ur = new UserRole { Id = Guid.NewGuid(), UserId = userId, Role = role };
             await _db.AddAsync(ur);
             await _db.SaveChangesAsync();
         }
 
-    public Task RemoveRoleAsync(Guid userId, string role) => Task.CompletedTask;
+    public async Task RemoveRoleAsync(Guid callerUserId, Guid userId, string role)
+    {
+        // For now, allow callers to remove roles; privileged removal could be gated similarly to Assign
+        var ur = _db.Set<UserRole>().FirstOrDefault(r => r.UserId == userId && r.Role == role);
+        if (ur == null) return; // no-op
+        _db.Set<UserRole>().Remove(ur);
+        await _db.SaveChangesAsync();
+    }
 
         public Task<IEnumerable<string>> GetUserRolesAsync(Guid userId)
         {

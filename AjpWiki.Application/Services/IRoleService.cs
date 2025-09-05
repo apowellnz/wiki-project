@@ -5,8 +5,9 @@ namespace AjpWiki.Application.Services
 {
     public interface IRoleService
     {
-    Task AssignRoleAsync(Guid userId, string role);
-    Task RemoveRoleAsync(Guid userId, string role);
+    // callerUserId: the actor performing the role assignment (used for permission checks)
+    Task AssignRoleAsync(Guid callerUserId, Guid userId, string role);
+    Task RemoveRoleAsync(Guid callerUserId, Guid userId, string role);
     Task<IEnumerable<string>> GetUserRolesAsync(Guid userId);
         Task<IEnumerable<string>> GetAllRolesAsync();
     }

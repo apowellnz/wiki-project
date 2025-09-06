@@ -10,15 +10,15 @@ namespace AjpWiki.Infrastructure.Tests.Services
     {
         // User Story 12: Role & Permission Management
         [Fact]
-    public void AssignRole_ShouldAddRoleToUser()
-    {
+        public void AssignRole_ShouldAddRoleToUser()
+        {
             var options = new DbContextOptionsBuilder<WikiDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             using var db = new WikiDbContext(options);
             var svc = new RoleService(db);
             var uid = Guid.NewGuid();
-        // caller == uid for simplicity; since no admin required for non-privileged assignment
-        svc.AssignRoleAsync(uid, uid, "editor").GetAwaiter().GetResult();
-        var roles = svc.GetUserRolesAsync(uid).GetAwaiter().GetResult();
+            // caller == uid for simplicity; since no admin required for non-privileged assignment
+            svc.AssignRoleAsync(uid, uid, "editor").GetAwaiter().GetResult();
+            var roles = svc.GetUserRolesAsync(uid).GetAwaiter().GetResult();
             Assert.Contains("editor", roles);
         }
 
@@ -72,16 +72,16 @@ namespace AjpWiki.Infrastructure.Tests.Services
             svc.RemoveRoleAsync(Guid.Empty, uid, "nonexistent").GetAwaiter().GetResult();
         }
 
-    [Fact]
-    public void AssignPrivilegedRole_WithoutPermission_ShouldThrow()
-    {
+        [Fact]
+        public void AssignPrivilegedRole_WithoutPermission_ShouldThrow()
+        {
             var options = new DbContextOptionsBuilder<WikiDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             using var db = new WikiDbContext(options);
             var svc = new RoleService(db);
             var caller = Guid.NewGuid();
             var target = Guid.NewGuid();
             Assert.Throws<UnauthorizedAccessException>(() => svc.AssignRoleAsync(caller, target, "admin").GetAwaiter().GetResult());
-    }
+        }
 
         [Fact]
         public void GetUserRoles_ShouldReturnAllRolesForUser()

@@ -42,31 +42,31 @@ namespace AjpWiki.Infrastructure.Services
             await _db.SaveChangesAsync();
         }
 
-    public async Task DeleteAccountAsync(Guid userId)
-    {
-        var user = await _db.Users.FindAsync(userId);
-        if (user == null) return;
+        public async Task DeleteAccountAsync(Guid userId)
+        {
+            var user = await _db.Users.FindAsync(userId);
+            if (user == null) return;
 
-        // Remove related notifications
-        var notes = _db.Notifications.Where(n => n.UserId == userId).ToList();
-        if (notes.Any()) _db.Notifications.RemoveRange(notes);
+            // Remove related notifications
+            var notes = _db.Notifications.Where(n => n.UserId == userId).ToList();
+            if (notes.Any()) _db.Notifications.RemoveRange(notes);
 
-        // Optionally, handle articles (not deleting articles by default)
+            // Optionally, handle articles (not deleting articles by default)
 
-        _db.Users.Remove(user);
-        await _db.SaveChangesAsync();
-    }
+            _db.Users.Remove(user);
+            await _db.SaveChangesAsync();
+        }
         public Task ResetPasswordAsync(string email) => Task.CompletedTask;
 
-    public Task ChangeAvatarAsync(Guid userId, byte[] avatarData)
-    {
-        // Validate avatar: max 2MB for now
-        const int maxBytes = 2 * 1024 * 1024;
-        if (avatarData == null || avatarData.Length == 0) throw new ArgumentException("avatar data required", nameof(avatarData));
-        if (avatarData.Length > maxBytes) throw new ArgumentException("avatar too large", nameof(avatarData));
+        public Task ChangeAvatarAsync(Guid userId, byte[] avatarData)
+        {
+            // Validate avatar: max 2MB for now
+            const int maxBytes = 2 * 1024 * 1024;
+            if (avatarData == null || avatarData.Length == 0) throw new ArgumentException("avatar data required", nameof(avatarData));
+            if (avatarData.Length > maxBytes) throw new ArgumentException("avatar too large", nameof(avatarData));
 
-        // For now we don't persist avatars; in future store in blob store and save AvatarId on user
-        return Task.CompletedTask;
-    }
+            // For now we don't persist avatars; in future store in blob store and save AvatarId on user
+            return Task.CompletedTask;
+        }
     }
 }

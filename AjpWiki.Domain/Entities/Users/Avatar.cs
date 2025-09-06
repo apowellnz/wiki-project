@@ -1,5 +1,3 @@
-using System;
-
 namespace AjpWiki.Domain.Entities.Users
 {
     // lightweight reference to a stored avatar; storage details are handled by infrastructure

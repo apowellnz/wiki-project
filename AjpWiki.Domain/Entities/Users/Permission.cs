@@ -1,4 +1,3 @@
-using System;
 namespace AjpWiki.Domain.Entities.Users
 {
     public class Permission

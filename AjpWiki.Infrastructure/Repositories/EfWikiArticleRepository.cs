@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AjpWiki.Domain.Entities.Articles;
 using AjpWiki.Domain.Repositories;
 using AjpWiki.Infrastructure.Data;

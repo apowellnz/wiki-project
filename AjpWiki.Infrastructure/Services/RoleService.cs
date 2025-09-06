@@ -25,14 +25,14 @@ namespace AjpWiki.Infrastructure.Services
             await _db.SaveChangesAsync();
         }
 
-    public async Task RemoveRoleAsync(Guid callerUserId, Guid userId, string role)
-    {
-        // For now, allow callers to remove roles; privileged removal could be gated similarly to Assign
-        var ur = _db.Set<UserRole>().FirstOrDefault(r => r.UserId == userId && r.Role == role);
-        if (ur == null) return; // no-op
-        _db.Set<UserRole>().Remove(ur);
-        await _db.SaveChangesAsync();
-    }
+        public async Task RemoveRoleAsync(Guid callerUserId, Guid userId, string role)
+        {
+            // For now, allow callers to remove roles; privileged removal could be gated similarly to Assign
+            var ur = _db.Set<UserRole>().FirstOrDefault(r => r.UserId == userId && r.Role == role);
+            if (ur == null) return; // no-op
+            _db.Set<UserRole>().Remove(ur);
+            await _db.SaveChangesAsync();
+        }
 
         public Task<IEnumerable<string>> GetUserRolesAsync(Guid userId)
         {

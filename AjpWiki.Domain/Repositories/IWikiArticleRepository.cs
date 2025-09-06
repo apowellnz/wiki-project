@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using AjpWiki.Domain.Entities.Articles;
 
 namespace AjpWiki.Domain.Repositories

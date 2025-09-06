@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace AjpWiki.Domain.Entities.Articles
 {
     /// <summary>
@@ -26,9 +23,9 @@ namespace AjpWiki.Domain.Entities.Articles
         // When this version was created (instant + offset)
         public DateTimeOffset CreatedAt { get; set; }
 
-    // Ordered list of page components (blocks)
-    // Not mapped by EF in the test harness to keep model simple.
-    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
-    public List<ArticleComponent> Components { get; set; } = new List<ArticleComponent>();
+        // Ordered list of page components (blocks)
+        // Not mapped by EF in the test harness to keep model simple.
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        public List<ArticleComponent> Components { get; set; } = new List<ArticleComponent>();
     }
 }

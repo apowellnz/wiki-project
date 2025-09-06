@@ -8,7 +8,7 @@ namespace AjpWiki.Infrastructure.Services
     public class NotificationService(WikiDbContext _db) : INotificationService
     {
 
-    public async Task<NotificationDto> SendNotificationAsync(Guid userId, string message)
+        public async Task<NotificationDto> SendNotificationAsync(Guid userId, string message)
         {
             // Verify user exists - policy: fail fast if recipient doesn't exist
             var userExists = _db.Users.Find(userId) != null;
@@ -32,7 +32,7 @@ namespace AjpWiki.Infrastructure.Services
             return Task.FromResult<IEnumerable<NotificationDto>>(list);
         }
 
-    public Task<NotificationPageDto> GetNotificationsAsync(Guid userId, int page, int pageSize)
+        public Task<NotificationPageDto> GetNotificationsAsync(Guid userId, int page, int pageSize)
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;

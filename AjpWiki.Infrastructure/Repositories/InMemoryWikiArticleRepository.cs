@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AjpWiki.Domain.Entities.Articles;
 using AjpWiki.Domain.Repositories;
 
@@ -15,8 +11,8 @@ namespace AjpWiki.Infrastructure.Repositories
         };
         private readonly List<WikiArticleVersion> _versions = new();
 
-    // Simple in-memory lock tracking (articleId -> (userId, acquiredAt))
-    private readonly Dictionary<Guid, (Guid UserId, DateTimeOffset AcquiredAt)> _locks = new();
+        // Simple in-memory lock tracking (articleId -> (userId, acquiredAt))
+        private readonly Dictionary<Guid, (Guid UserId, DateTimeOffset AcquiredAt)> _locks = new();
 
         public Task<WikiArticle?> GetByIdAsync(Guid id) => Task.FromResult(_store.FirstOrDefault(x => x.Id == id));
 
@@ -90,7 +86,7 @@ namespace AjpWiki.Infrastructure.Repositories
             }
 
             // If existing lock expired, replace it
-        if (current.AcquiredAt + lockTimeout <= now)
+            if (current.AcquiredAt + lockTimeout <= now)
             {
                 _locks[articleId] = (userId, now);
                 var article = _store.FirstOrDefault(a => a.Id == articleId);
@@ -98,7 +94,7 @@ namespace AjpWiki.Infrastructure.Repositories
                 {
                     article.IsLocked = true;
                     article.LockedByUserId = userId;
-            article.LockAcquiredAt = now;
+                    article.LockAcquiredAt = now;
                 }
                 return Task.FromResult(true);
             }

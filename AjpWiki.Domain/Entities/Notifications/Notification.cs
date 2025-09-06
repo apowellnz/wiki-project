@@ -1,5 +1,3 @@
-using System;
-
 namespace AjpWiki.Domain.Entities.Notifications
 {
     public class Notification

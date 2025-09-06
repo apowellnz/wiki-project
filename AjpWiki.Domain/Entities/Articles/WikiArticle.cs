@@ -1,5 +1,3 @@
-using System;
-
 namespace AjpWiki.Domain.Entities.Articles
 {
     /// <summary>

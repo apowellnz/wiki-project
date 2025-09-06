@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace AjpWiki.Domain.Entities.Users
 {
     // Aggregate root: User

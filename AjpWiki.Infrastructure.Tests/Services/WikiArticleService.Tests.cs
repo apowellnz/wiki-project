@@ -6,14 +6,13 @@ using AjpWiki.Infrastructure.Repositories;
 using AjpWiki.Infrastructure.Services;
 using AjpWiki.Application.Utils;
 using AjpWiki.Application.Exceptions;
-using AjpWiki.Domain.Entities.Articles;
 using System.Linq;
 
 namespace AjpWiki.Infrastructure.Tests.Services
 {
     public class WikiArticleServiceTests
     {
-    // Note: placeholder tests removed to keep suite focused; implemented tests follow.
+        // Note: placeholder tests removed to keep suite focused; implemented tests follow.
 
         // User Story 10: Article Creation
         [Fact]
@@ -95,6 +94,6 @@ namespace AjpWiki.Infrastructure.Tests.Services
             Assert.Throws<DuplicateSlugException>(() => service.CreateArticleAsync(dto).GetAwaiter().GetResult());
         }
 
-    // User Story 15: Tagging/Categorization
+        // User Story 15: Tagging/Categorization
     }
 }

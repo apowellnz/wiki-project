@@ -25,11 +25,14 @@ namespace AjpWiki.Infrastructure.Tests.Services
             db.Users.Add(new AjpWiki.Domain.Entities.Users.User { Id = uid, Email = "u@example.com", CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow });
             db.SaveChanges();
 
-            svc.SendNotificationAsync(uid, "hello").GetAwaiter().GetResult();
+            var created = svc.SendNotificationAsync(uid, "hello").GetAwaiter().GetResult();
 
             var messages = db.Notifications.Where(n => n.UserId == uid).Select(n => n.Message).ToList();
             Assert.Single(messages);
             Assert.Equal("hello", messages.First());
+            Assert.Equal(uid, created.UserId);
+            Assert.Equal("hello", created.Message);
+            Assert.False(created.IsRead);
         }
 
         [Fact]
@@ -82,11 +85,16 @@ namespace AjpWiki.Infrastructure.Tests.Services
             db.SaveChanges();
 
             var svc = new NotificationService(db);
-            var page1 = svc.GetNotificationsAsync(uid, 1, 10).GetAwaiter().GetResult().ToList();
-            var page3 = svc.GetNotificationsAsync(uid, 3, 10).GetAwaiter().GetResult().ToList();
+            var page1Dto = svc.GetNotificationsAsync(uid, 1, 10).GetAwaiter().GetResult();
+            var page3Dto = svc.GetNotificationsAsync(uid, 3, 10).GetAwaiter().GetResult();
+            var page1 = page1Dto.Items.ToList();
+            var page3 = page3Dto.Items.ToList();
 
             Assert.Equal(10, page1.Count);
             Assert.Equal(5, page3.Count);
+            Assert.Equal(25, page1Dto.TotalCount);
+            Assert.Equal(1, page1Dto.Page);
+            Assert.Equal(10, page1Dto.PageSize);
             // Ensure ordering: newest first (m1 was newest because -1 minute)
             Assert.Equal("m1", page1.First().Message);
         }

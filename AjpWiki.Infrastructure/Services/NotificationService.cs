@@ -17,7 +17,7 @@ namespace AjpWiki.Infrastructure.Services
             _db = db;
         }
 
-        public async Task SendNotificationAsync(Guid userId, string message)
+    public async Task<AjpWiki.Application.Dto.NotificationDto> SendNotificationAsync(Guid userId, string message)
         {
             // Verify user exists - policy: fail fast if recipient doesn't exist
             var userExists = _db.Users.Find(userId) != null;
@@ -26,10 +26,13 @@ namespace AjpWiki.Infrastructure.Services
             var n = new Notification { Id = Guid.NewGuid(), UserId = userId, Message = message, IsRead = false, CreatedAt = DateTimeOffset.UtcNow };
             await _db.Notifications.AddAsync(n);
             await _db.SaveChangesAsync();
+
+            return new AjpWiki.Application.Dto.NotificationDto(n.Id, n.UserId, n.Message, n.IsRead, n.CreatedAt);
         }
 
         public Task<IEnumerable<AjpWiki.Application.Dto.NotificationDto>> GetNotificationsAsync(Guid userId)
         {
+            // This method remains unchanged
             var list = _db.Notifications.Where(x => x.UserId == userId)
                 .OrderByDescending(n => n.CreatedAt)
                 .Select(x => new AjpWiki.Application.Dto.NotificationDto(x.Id, x.UserId, x.Message, x.IsRead, x.CreatedAt))
@@ -38,20 +41,22 @@ namespace AjpWiki.Infrastructure.Services
             return Task.FromResult<IEnumerable<AjpWiki.Application.Dto.NotificationDto>>(list);
         }
 
-    public Task<IEnumerable<AjpWiki.Application.Dto.NotificationDto>> GetNotificationsAsync(Guid userId, int page, int pageSize)
+    public Task<AjpWiki.Application.Dto.NotificationPageDto> GetNotificationsAsync(Guid userId, int page, int pageSize)
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
 
             var skip = (page - 1) * pageSize;
-            var list = _db.Notifications.Where(x => x.UserId == userId)
-                .OrderByDescending(n => n.CreatedAt)
-                .Skip(skip)
-                .Take(pageSize)
+            var items = _db.Notifications.Where(x => x.UserId == userId)
+                .OrderByDescending(n => n.CreatedAt);
+
+            var total = items.Count();
+            var pageItems = items.Skip(skip).Take(pageSize)
                 .Select(x => new AjpWiki.Application.Dto.NotificationDto(x.Id, x.UserId, x.Message, x.IsRead, x.CreatedAt))
                 .ToList();
 
-            return Task.FromResult<IEnumerable<AjpWiki.Application.Dto.NotificationDto>>(list);
+            var pageDto = new AjpWiki.Application.Dto.NotificationPageDto(pageItems, total, page, pageSize);
+            return Task.FromResult(pageDto);
         }
 
         public async Task MarkAsReadAsync(Guid notificationId)

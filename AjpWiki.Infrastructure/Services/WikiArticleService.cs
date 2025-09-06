@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AjpWiki.Application.Dto;
 using AjpWiki.Application.Mappings;
+using AjpWiki.Application.Utils;
+using AjpWiki.Application.Exceptions;
 using AjpWiki.Application.Services;
 using AjpWiki.Domain.Entities.Articles;
 using AjpWiki.Domain.Repositories;
@@ -21,9 +23,20 @@ namespace AjpWiki.Infrastructure.Services
 
         public async Task<WikiArticleDto> CreateArticleAsync(WikiArticleDto articleDto)
         {
-            var entity = new WikiArticle { Id = articleDto.Id == Guid.Empty ? Guid.NewGuid() : articleDto.Id, Title = articleDto.Title, CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow };
-            var created = await _repo.CreateArticleAsync(entity);
-            return created.ToDto();
+            var id = articleDto.Id == Guid.Empty ? Guid.NewGuid() : articleDto.Id;
+            var slug = articleDto.Slug;
+            if (string.IsNullOrWhiteSpace(slug)) slug = SlugHelper.Generate(articleDto.Title);
+
+            var entity = new WikiArticle { Id = id, Title = articleDto.Title, Slug = slug, CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow };
+            try
+            {
+                var created = await _repo.CreateArticleAsync(entity);
+                return created.ToDto();
+            }
+            catch (InvalidOperationException ex) when (ex.Message?.Contains("slug", StringComparison.InvariantCultureIgnoreCase) == true)
+            {
+                throw new DuplicateSlugException(ex.Message);
+            }
         }
 
         public async Task<WikiArticleDto> EditArticleAsync(Guid articleId, WikiArticleDto articleDto)

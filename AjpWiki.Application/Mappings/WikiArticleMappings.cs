@@ -8,6 +8,7 @@ namespace AjpWiki.Application.Mappings
         public static WikiArticleDto ToDto(this WikiArticle e) => new(
             e.Id,
             e.Title,
+            e.Slug,
             e.CurrentVersionId,
             e.PublishedVersionId,
             e.IsLocked

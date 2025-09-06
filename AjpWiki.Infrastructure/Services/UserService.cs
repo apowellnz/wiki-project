@@ -1,20 +1,11 @@
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using AjpWiki.Application.Services;
 using AjpWiki.Infrastructure.Data;
 using AjpWiki.Domain.Entities.Users;
-using System;
 
 namespace AjpWiki.Infrastructure.Services
 {
-    public class UserService : IUserService
+    public class UserService(WikiDbContext _db) : IUserService
     {
-        private readonly WikiDbContext _db;
-
-        public UserService(WikiDbContext db)
-        {
-            _db = db;
-        }
 
         public async Task CreateUserAsync(string name, string email, string password)
         {

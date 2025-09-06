@@ -12,14 +12,8 @@ using AjpWiki.Domain.Repositories;
 
 namespace AjpWiki.Infrastructure.Services
 {
-    public class WikiArticleService : IWikiArticleService
+    public class WikiArticleService(IWikiArticleRepository _repo) : IWikiArticleService
     {
-        private readonly IWikiArticleRepository _repo;
-
-        public WikiArticleService(IWikiArticleRepository repo)
-        {
-            _repo = repo;
-        }
 
         public async Task<WikiArticleDto> CreateArticleAsync(WikiArticleDto articleDto)
         {

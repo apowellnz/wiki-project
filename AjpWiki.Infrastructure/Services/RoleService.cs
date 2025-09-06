@@ -1,21 +1,11 @@
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using AjpWiki.Application.Services;
 using AjpWiki.Infrastructure.Data;
 using AjpWiki.Domain.Entities.Users;
-using System;
-using System.Linq;
 
 namespace AjpWiki.Infrastructure.Services
 {
-    public class RoleService : IRoleService
+    public class RoleService(WikiDbContext _db) : IRoleService
     {
-        private readonly WikiDbContext _db;
-
-        public RoleService(WikiDbContext db)
-        {
-            _db = db;
-        }
 
         public async Task AssignRoleAsync(Guid callerUserId, Guid userId, string role)
         {

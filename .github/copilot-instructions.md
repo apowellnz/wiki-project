@@ -22,6 +22,9 @@ Short, focused guidelines so an AI agent can be productive in this repo.
 - EF/implementation classes belong in `AjpWiki.Infrastructure` (e.g. `WikiDbContext`, repository/service implementations).
 - Place helpers that are framework-agnostic (e.g. `SlugHelper`) in `AjpWiki.Application/Utils` so they are testable.
 
+- Constructor style: when services have no constructor logic, prefer C# primary constructors for brevity (e.g. `public class NotificationService(WikiDbContext _db) : INotificationService`).
+  - This requires a recent C# LangVersion (the repo targets .NET 8 which supports it). If build issues appear on older toolchains, use the explicit constructor pattern.
+
 ## Routing / URL strategy (how articles map to URLs)
 - The codebase uses a `Slug` property on `WikiArticle`. The expected pattern:
   - Generate canonical slug on create (use a `SlugHelper` in `Application`).
